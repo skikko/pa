@@ -40,8 +40,6 @@ html, body {
   justify-content: center;
 }
 
-/* Manteniamo dimensioni ridotte per evitare tagli su mobile, 
-   ma la risoluzione dell'immagine finale non ne risente */
 .camera-container {
   position: relative;
   width: 60vw;
@@ -78,7 +76,7 @@ html, body {
   box-sizing: border-box;
 }
 
-#capture-btn, #download-link, #upload-frame-btn, #discard-btn, #print-btn {
+#capture-btn, #download-link, #upload-frame-btn, #discard-btn, #print-btn, #flash-btn {
   display: block;
   width: 100%;
   background: #000;
@@ -96,8 +94,22 @@ html, body {
   text-decoration: none;
 }
 
-#capture-btn:hover, #upload-frame-btn:hover, #discard-btn:hover, #print-btn:hover, #download-link:hover {
+#capture-btn:hover, #upload-frame-btn:hover, #discard-btn:hover, #print-btn:hover, #flash-btn:hover {
   background: #333;
+}
+
+/* Stile per l'effetto flash */
+#flash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.2s ease-in-out;
 }
 
 @media screen and (orientation:portrait) {
