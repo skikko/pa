@@ -9,14 +9,35 @@ const frameInput = document.getElementById('frame-input');
 const discardBtn = document.getElementById('discard-btn');
 const previewImg = document.getElementById('preview-img');
 const printBtn = document.getElementById('print-btn');
+const flashBtn = document.getElementById('flash-btn');
+const flashOverlay = document.getElementById('flash-overlay');
 
-// Impostiamo direttamente la risoluzione desiderata
+// Impostazioni iniziali
+let flashEnabled = false;
+
+// Impostiamo la risoluzione desiderata
 const desiredWidth = 1671;
 const desiredHeight = 1181;
 canvas.width = desiredWidth;
 canvas.height = desiredHeight;
 
-// Richiesta media con risoluzione ideale
+// Attiva/disattiva flash
+flashBtn.addEventListener('click', () => {
+  flashEnabled = !flashEnabled;
+  flashBtn.textContent = flashEnabled ? "Disattiva Flash" : "Attiva Flash";
+});
+
+// Simula il flash
+function triggerFlash() {
+  if (flashEnabled) {
+    flashOverlay.style.opacity = '1';
+    setTimeout(() => {
+      flashOverlay.style.opacity = '0';
+    }, 200);
+  }
+}
+
+// Accesso alla fotocamera
 navigator.mediaDevices.getUserMedia({
   video: {
     facingMode: "environment",
@@ -32,43 +53,25 @@ navigator.mediaDevices.getUserMedia({
   alert("Impossibile accedere alla fotocamera. Controlla i permessi o il supporto del tuo browser.");
 });
 
-// Non usiamo più video.videoWidth/video.videoHeight per il canvas
-// poiché vogliamo forzare una risoluzione fissa.
-
 // Scatta Foto
 captureBtn.addEventListener('click', () => {
-  // Disegniamo il video sul canvas con la dimensione fissata a 1671x1181
+  triggerFlash(); // Attiva l'effetto flash
   ctx.drawImage(video, 0, 0, desiredWidth, desiredHeight);
 
   const frameImg = new Image();
   frameImg.crossOrigin = 'anonymous';
   frameImg.src = selectedFrame.src;
   frameImg.onload = () => {
-    // Disegniamo la cornice
     ctx.drawImage(frameImg, 0, 0, desiredWidth, desiredHeight);
     const dataURL = canvas.toDataURL('image/png');
     previewImg.src = dataURL;
     previewImg.style.display = 'block';
-
     video.style.display = 'none';
     selectedFrame.style.display = 'none';
-
-    // Generiamo un nome file unico con data e ora
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const fileName = `foto_${year}${month}${day}_${hours}${minutes}${seconds}.png`;
-
     downloadLink.href = dataURL;
-    downloadLink.download = fileName;
     downloadLink.style.display = 'block';
     printBtn.style.display = 'block';
     discardBtn.style.display = 'block';
-
     captureBtn.style.display = 'none';
     uploadFrameBtn.style.display = 'none';
   };
@@ -81,7 +84,6 @@ uploadFrameBtn.addEventListener('click', () => {
 frameInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function (event) {
     selectedFrame.src = event.target.result;
@@ -93,11 +95,9 @@ discardBtn.addEventListener('click', () => {
   previewImg.style.display = 'none';
   video.style.display = 'block';
   selectedFrame.style.display = 'block';
-
   downloadLink.style.display = 'none';
   discardBtn.style.display = 'none';
   printBtn.style.display = 'none';
-
   captureBtn.style.display = 'block';
   uploadFrameBtn.style.display = 'block';
 });
@@ -107,7 +107,6 @@ printBtn.addEventListener('click', () => {
   printWindow.document.write(`<html><head><title>Stampa Immagine</title></head><body style="margin:0; padding:0;">
   <img src="${previewImg.src}" style="width:100%; height:auto;" />
   </body></html>`);
-
   printWindow.document.close();
   printWindow.focus();
   printWindow.document.querySelector('img').onload = () => {
