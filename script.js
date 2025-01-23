@@ -14,6 +14,7 @@ const flashOverlay = document.getElementById('flash-overlay');
 
 // Impostazioni iniziali
 let flashEnabled = false;
+let track; // Per accedere al track della fotocamera
 
 // Impostiamo la risoluzione desiderata
 const desiredWidth = 1671;
@@ -25,11 +26,21 @@ canvas.height = desiredHeight;
 flashBtn.addEventListener('click', () => {
   flashEnabled = !flashEnabled;
   flashBtn.textContent = flashEnabled ? "Disattiva Flash" : "Attiva Flash";
+  if (track) {
+    const capabilities = track.getCapabilities();
+    if (capabilities.torch) {
+      track.applyConstraints({
+        advanced: [{ torch: flashEnabled }]
+      }).catch(err => console.error("Errore nell'attivazione del flash:", err));
+    } else {
+      console.warn("Il flash hardware non è supportato su questo dispositivo.");
+    }
+  }
 });
 
-// Simula il flash
+// Simula il flash visivo
 function triggerFlash() {
-  if (flashEnabled) {
+  if (flashEnabled && !track?.getCapabilities().torch) {
     flashOverlay.style.opacity = '1';
     setTimeout(() => {
       flashOverlay.style.opacity = '0';
@@ -48,6 +59,9 @@ navigator.mediaDevices.getUserMedia({
 }).then(stream => {
   video.srcObject = stream;
   video.play();
+
+  // Ottenere il track video per il controllo del flash
+  track = stream.getVideoTracks()[0];
 }).catch(err => {
   console.error("Errore nell'accesso alla fotocamera:", err);
   alert("Impossibile accedere alla fotocamera. Controlla i permessi o il supporto del tuo browser.");
@@ -55,7 +69,9 @@ navigator.mediaDevices.getUserMedia({
 
 // Scatta Foto
 captureBtn.addEventListener('click', () => {
-  triggerFlash(); // Attiva l'effetto flash
+  triggerFlash(); // Attiva l'effetto flash visivo se necessario
+
+  // Disegna l'immagine sul canvas
   ctx.drawImage(video, 0, 0, desiredWidth, desiredHeight);
 
   const frameImg = new Image();
