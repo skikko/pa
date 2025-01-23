@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>MVP Cornice Fotocamera</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="rotate-message">Ruota il dispositivo in orizzontale per continuare.</div>
+  
+  <div class="app-content">
+    <div class="left-panel">
+      <div class="camera-container">
+        <video id="video" autoplay playsinline></video>
+        <img id="selected-frame" src="frames/frame.png" alt="Cornice" />
+        <img id="preview-img" alt="Anteprima" style="display:none;"/>
+      </div>
+    </div>
+    <div class="right-panel">
+      <button id="capture-btn">Scatta Foto</button>
+      <button id="upload-frame-btn">Carica Cornice</button>
+
+      <a id="download-link" href="#" download="foto_cornice.png" style="display:none;">Scarica Foto</a>
+      <button id="print-btn" style="display:none;">Stampa</button>
+      <button id="discard-btn" style="display:none;">Scarta</button>
+
+      <input type="file" id="frame-input" accept="image/*" style="display:none;" />
+    </div>
+    <!-- Non impostiamo dimensioni fisse al canvas, le assegniamo dopo il loadedmetadata -->
+    <canvas id="canvas" style="display:none;"></canvas>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>
